@@ -5,6 +5,9 @@ import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "../atoms";
 import { IForm } from "./Board";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 
 interface IDraggableCardProps {
   toDoID: number;
@@ -64,11 +67,21 @@ const DraggableCard = ({
                 })}
               />
             ) : (
-              <span>{toDoText}</span>
+              <Text>{toDoText}</Text>
             )}
             <ItemBtn>
-              <button onClick={() => setRename(!rename)}>Re</button>
-              <button onClick={() => setDeleted(!deleted)}>X</button>
+              <EditBtn>
+                <FontAwesomeIcon
+                  icon={faPenToSquare}
+                  onClick={() => setRename(!rename)}
+                />
+              </EditBtn>
+              <DeleteBtn>
+                <FontAwesomeIcon
+                  icon={faTrashCan}
+                  onClick={() => setDeleted(!deleted)}
+                />
+              </DeleteBtn>
             </ItemBtn>
           </Form>
         </Card>
@@ -97,16 +110,23 @@ const Form = styled.form`
 const ItemBtn = styled.div`
   display: flex;
   button {
+    all: unset;
+    width: 20px;
     margin-right: 3px;
-    width: 30px;
-    border-radius: 15px;
-    border: none;
-    background-color: ${(props) => props.theme.boardColor};
+    cursor: pointer;
   }
 `;
+const EditBtn = styled.button``;
+
+const DeleteBtn = styled.button``;
 
 const Item = styled.input`
   border: none;
   background-color: unset;
   outline: none;
+`;
+
+const Text = styled.span`
+  font-size: 14px;
+  font-weight: 350;
 `;

@@ -78,8 +78,8 @@ const Board = ({ toDos, boardId }: IBoardPops) => {
             <Title>{boardId}</Title>
           )}
           <ItemBtn>
-            <button onClick={() => setBoardRename(!boardRename)}>RE</button>
-            <button onClick={() => setBoardDelete(!boardDelete)}>X</button>
+            <EditBtn onClick={() => setBoardRename(!boardRename)} />
+            <ExitBtn onClick={() => setBoardDelete(!boardDelete)} />
           </ItemBtn>
         </Form>
       </Heder>
@@ -118,8 +118,9 @@ const Board = ({ toDos, boardId }: IBoardPops) => {
 export default Board;
 
 const Wrapper = styled.div`
-  width: 300px;
-  padding-top: 10px;
+  margin-top: 2em;
+  width: 100%;
+  padding-top: 20px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
   min-height: 300px;
@@ -127,17 +128,14 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 
-const Heder = styled.div`
-  display: flex;
-  justify-content: center;
-`;
+const Heder = styled.div``;
 
 const Title = styled.span`
   text-align: center;
   font-weight: 600;
   margin-bottom: 10px;
   font-size: 18px;
-  margin-right: 2em;
+  margin: 0 auto;
 `;
 
 const Area = styled.div<IAreaProps>`
@@ -155,23 +153,61 @@ const Area = styled.div<IAreaProps>`
 const Form = styled.form`
   display: flex;
   width: 100%;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
   position: relative;
+
   input {
-    width: 50%;
+    margin: 5px;
+    width: 100%;
     height: 30px;
+    text-align: center;
     border-radius: 15px;
     outline: none;
     border: none;
-    padding-left: 20px;
   }
 `;
 const ItemBtn = styled.div`
-  position: absolute;
-  right: 10px;
-  top: 0px;
-  padding-left: 10px;
   display: flex;
+  align-items: center;
+`;
+const ExitBtn = styled.button`
+  all: unset;
+  border-radius: 20px;
+  font-weight: 400;
+  font-size: 14px;
+  width: 15px;
+  height: 15px;
+  text-align: center;
+  background-color: tomato;
+  margin-right: 3px;
+  &::after {
+    content: "x";
+    text-align: center;
+    display: none;
+  }
+  &:hover::after {
+    display: inline-block;
+  }
+`;
+
+const EditBtn = styled.button`
+  all: unset;
+  border-radius: 20px;
+  font-weight: 400;
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  text-align: center;
+  background-color: limegreen;
+  margin-right: 3px;
+  &::after {
+    content: "=";
+    text-align: center;
+    display: none;
+  }
+  &:hover::after {
+    display: inline-block;
+  }
 `;

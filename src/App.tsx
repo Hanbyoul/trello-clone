@@ -33,14 +33,14 @@ function App() {
             placeholder="Add new Board"
           />
         </Form>
+        <DeleteCard />
       </Heder>
       <Wrapper>
-        <DeleteCard />
-        <Boards>
+        <BoardList>
           {Object.keys(toDos).map((boardId) => (
             <Board key={boardId} toDos={toDos[boardId]} boardId={boardId} />
           ))}
-        </Boards>
+        </BoardList>
       </Wrapper>
     </DragDropContext>
   );
@@ -50,29 +50,33 @@ export default App;
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 680px;
+  max-width: 800px;
   width: 100%;
+  height: 100%;
   margin: 0 auto;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 `;
 
-const Boards = styled.div`
+const Heder = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5em;
+`;
+const BoardList = styled.div`
   display: grid;
   gap: 10px;
   width: 100%;
   grid-template-columns: repeat(3, 1fr);
 `;
-const Heder = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 5em;
-`;
+
 const Form = styled.form`
+  margin-left: 2em;
   input {
-    width: 400px;
+    width: 300px;
     height: 40px;
+    text-align: center;
     outline: none;
     border: none;
     border-radius: 20px;

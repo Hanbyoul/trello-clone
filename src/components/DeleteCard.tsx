@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 const DeleteCard = () => {
   return (
-    <Wrapper>
+    <>
       <Droppable droppableId="Delete">
         {(magic) => (
           <div ref={magic.innerRef} {...magic.droppableProps}>
@@ -15,25 +15,17 @@ const DeleteCard = () => {
           </div>
         )}
       </Droppable>
-    </Wrapper>
+    </>
   );
 };
 
 export default DeleteCard;
 
-const Wrapper = styled.div`
-  position: absolute;
-  top: 1em;
-  right: 2em;
-`;
-
 const Trash = styled.div`
-  width: 100px;
-  height: 100px;
+  margin-left: 2em;
   svg {
-    width: 100px;
-    height: 100px;
-
+    width: 50px;
+    height: 50px;
     border-radius: 25px;
     color: red;
   }
