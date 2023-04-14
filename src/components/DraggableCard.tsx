@@ -27,27 +27,27 @@ const DraggableCard = ({
   const [deleted, setDeleted] = useState(false);
   const [rename, setRename] = useState(false);
 
-  const Valid = ({ toDo }: IForm) => {
-    if (deleted) {
-      setTodo((allBoard) => {
-        const deleteItem = [...allBoard[boardId]];
-        deleteItem.splice(index, 1);
-        return { ...allBoard, [boardId]: deleteItem };
-      });
-    } else {
-      setTodo((allBoard) => {
-        const renameItem = [...allBoard[boardId]];
-        const newToDo = {
-          id: Date.now(),
-          text: toDo,
-        };
-        if (newToDo.text !== "" || null) {
-          renameItem.splice(index, 1, newToDo);
-        }
-        return { ...allBoard, [boardId]: renameItem };
-      });
-    }
-  };
+  // const Valid = ({ toDo }: IForm) => {
+  //   if (deleted) {
+  //     setTodo((allBoard) => {
+  //       const deleteItem = [...allBoard[boardId]];
+  //       deleteItem.splice(index, 1);
+  //       return { ...allBoard, [boardId]: deleteItem };
+  //     });
+  //   } else {
+  //     setTodo((allBoard) => {
+  //       const renameItem = [...allBoard[boardId]];
+  //       const newToDo = {
+  //         id: Date.now(),
+  //         text: toDo,
+  //       };
+  //       if (newToDo.text !== "" || null) {
+  //         renameItem.splice(index, 1, newToDo);
+  //       }
+  //       return { ...allBoard, [boardId]: renameItem };
+  //     });
+  //   }
+  // };
 
   return (
     <Draggable draggableId={toDoID + ""} index={index}>
@@ -58,7 +58,7 @@ const DraggableCard = ({
           {...magic.draggableProps}
           {...magic.dragHandleProps}
         >
-          <Form onSubmit={handleSubmit(Valid)}>
+          {/* <Form onSubmit={handleSubmit(Valid)}>
             {rename ? (
               <Item
                 type="text"
@@ -83,7 +83,7 @@ const DraggableCard = ({
                 />
               </DeleteBtn>
             </ItemBtn>
-          </Form>
+          </Form> */}
         </Card>
       )}
     </Draggable>

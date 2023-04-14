@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Droppable } from "react-beautiful-dnd";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
@@ -27,91 +27,93 @@ const Board = ({ toDos, boardId }: IBoardPops) => {
   const [boardDelete, setBoardDelete] = useState(false);
   const [boardRename, setBoardRename] = useState(false);
 
-  const onValid = ({ toDo }: IForm) => {
-    const newToDo = {
-      id: Date.now(),
-      text: toDo,
-    };
-    setTodos((allBoard) => {
-      return { ...allBoard, [boardId]: [...allBoard[boardId], newToDo] };
-    });
-    setValue("toDo", "");
-  };
+  // const onValid = ({ toDo }: IForm) => {
+  //   const newToDo = {
+  //     id: Date.now(),
+  //     text: toDo,
+  //   };
+  //   setTodos((allBoard) => {
+  //     return { ...allBoard, [boardId]: [...allBoard[boardId], newToDo] };
+  //   });
+  //   setValue("toDo", "");
+  // };
 
-  const boardChange = ({ boardChange }: IForm) => {
-    if (boardDelete) {
-      setTodos((allBoard) => {
-        const CopyBoard = { ...allBoard };
-        delete CopyBoard[boardId];
-        return CopyBoard;
-      });
-    } else {
-      setTodos((allBoard) => {
-        const copies = { ...allBoard };
-        if (
-          boardChange.trim() !== "" &&
-          Object.keys(copies).some((item) => item === boardChange) !== true
-        ) {
-          copies[boardChange] = allBoard[boardId];
-          const { [boardId]: temp, ...rest } = copies;
-          const newBoard = rest;
-          return newBoard;
-        }
-        return allBoard;
-      });
-    }
-  };
+  // const boardChange = ({ boardChange }: IForm) => {
+  //   if (boardDelete) {
+  //     setTodos((allBoard) => {
+  //       const CopyBoard = { ...allBoard };
+  //       delete CopyBoard[boardId];
+  //       return CopyBoard;
+  //     });
+  //   } else {
+  //     setTodos((allBoard) => {
+  //       const copies = { ...allBoard };
+  //       if (
+  //         boardChange.trim() !== "" &&
+  //         Object.keys(copies).some((item) => item === boardChange) !== true
+  //       ) {
+  //         copies[boardChange] = allBoard[boardId];
+  //         const { [boardId]: temp, ...rest } = copies;
+  //         const newBoard = rest;
+  //         return newBoard;
+  //       }
+  //       return allBoard;
+  //     });
+  //   }
+  // };
 
   return (
-    <Wrapper>
-      <Heder>
-        <Form onSubmit={handleSubmit(boardChange)}>
-          {boardRename ? (
-            <input
-              {...register("boardChange", {
-                required: true,
-              })}
-              type="text"
-              placeholder="Renaming"
-            />
-          ) : (
-            <Title>{boardId}</Title>
-          )}
-          <ItemBtn>
-            <EditBtn onClick={() => setBoardRename(!boardRename)} />
-            <ExitBtn onClick={() => setBoardDelete(!boardDelete)} />
-          </ItemBtn>
-        </Form>
-      </Heder>
-      <Form onSubmit={handleSubmit(onValid)}>
-        <input
-          {...register("toDo")}
-          type="text"
-          placeholder={`Add task on ${boardId}`}
-        />
-      </Form>
-      <Droppable droppableId={boardId}>
-        {(magic, info) => (
-          <Area
-            isDraggingOver={info.isDraggingOver}
-            draggingFromThisWith={Boolean(info.draggingFromThisWith)}
-            ref={magic.innerRef}
-            {...magic.droppableProps}
-          >
-            {toDos.map((toDo, index) => (
-              <DraggableCard
-                key={toDo.id}
-                toDoID={toDo.id}
-                index={index}
-                toDoText={toDo.text}
-                boardId={boardId}
+    <>
+      <Wrapper>
+        {/* <Heder>
+          <Form onSubmit={handleSubmit(boardChange)}>
+            {boardRename ? (
+              <input
+                {...register("boardChange", {
+                  required: true,
+                })}
+                type="text"
+                placeholder="Renaming"
               />
-            ))}
-            {magic.placeholder}
-          </Area>
-        )}
-      </Droppable>
-    </Wrapper>
+            ) : (
+              <Title>{boardId}</Title>
+            )}
+            <ItemBtn>
+              <EditBtn onClick={() => setBoardRename(!boardRename)} />
+              <ExitBtn onClick={() => setBoardDelete(!boardDelete)} />
+            </ItemBtn>
+          </Form>
+        </Heder>
+        <Form onSubmit={handleSubmit(onValid)}>
+          <input
+            {...register("toDo")}
+            type="text"
+            placeholder={`Add task on ${boardId}`}
+          />
+        </Form> */}
+        {/* <Droppable droppableId={boardId} type="card">
+          {(magic, info) => (
+            <Area
+              isDraggingOver={info.isDraggingOver}
+              draggingFromThisWith={Boolean(info.draggingFromThisWith)}
+              ref={magic.innerRef}
+              {...magic.droppableProps}
+            >
+              {toDos.map((toDo, index) => (
+                <DraggableCard
+                  key={toDo.id}
+                  toDoID={toDo.id}
+                  index={index}
+                  toDoText={toDo.text}
+                  boardId={boardId}
+                />
+              ))}
+              {magic.placeholder}
+            </Area>
+          )}
+        </Droppable> */}
+      </Wrapper>
+    </>
   );
 };
 
