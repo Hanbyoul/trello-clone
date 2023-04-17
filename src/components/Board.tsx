@@ -1,17 +1,21 @@
-import { useState } from "react";
-import { Draggable, Droppable } from "react-beautiful-dnd";
+import React, { useState } from "react";
+import { Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { IToDo, toDoState } from "../atoms";
+import { BoardKey, BoardType, IToDo, IToDoState, toDoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
+import { deepCopy } from "../\butils";
 
 interface IBoardPops {
-  toDos: IToDo[];
+  toDos: {
+    [key: string]: IToDo[];
+  };
   boardId: string;
+  boardIndex: number;
 }
 
-interface IAreaProps {
+export interface IAreaProps {
   draggingFromThisWith: boolean;
   isDraggingOver: boolean;
 }
@@ -21,51 +25,60 @@ export interface IForm {
   boardChange: string;
 }
 
-const Board = ({ toDos, boardId }: IBoardPops) => {
+const Board = ({ toDos, boardId, boardIndex }: IBoardPops) => {
   const setTodos = useSetRecoilState(toDoState);
+  const setBoardType = useSetRecoilState<BoardKey>(BoardType);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const [boardDelete, setBoardDelete] = useState(false);
   const [boardRename, setBoardRename] = useState(false);
 
-  // const onValid = ({ toDo }: IForm) => {
-  //   const newToDo = {
-  //     id: Date.now(),
-  //     text: toDo,
-  //   };
-  //   setTodos((allBoard) => {
-  //     return { ...allBoard, [boardId]: [...allBoard[boardId], newToDo] };
-  //   });
-  //   setValue("toDo", "");
-  // };
+  const selectBoard = () => {
+    setBoardType((prev) => (prev = "board"));
+  };
+  const onValid = ({ toDo }: IForm) => {
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    setTodos((allBoard) => {
+      const CopyBoard: IToDoState[] = deepCopy(allBoard);
+      const currentBoard = [...CopyBoard[boardIndex][boardId]];
+      currentBoard.push(newToDo);
+      CopyBoard[boardIndex][boardId] = currentBoard;
 
-  // const boardChange = ({ boardChange }: IForm) => {
-  //   if (boardDelete) {
-  //     setTodos((allBoard) => {
-  //       const CopyBoard = { ...allBoard };
-  //       delete CopyBoard[boardId];
-  //       return CopyBoard;
-  //     });
-  //   } else {
-  //     setTodos((allBoard) => {
-  //       const copies = { ...allBoard };
-  //       if (
-  //         boardChange.trim() !== "" &&
-  //         Object.keys(copies).some((item) => item === boardChange) !== true
-  //       ) {
-  //         copies[boardChange] = allBoard[boardId];
-  //         const { [boardId]: temp, ...rest } = copies;
-  //         const newBoard = rest;
-  //         return newBoard;
-  //       }
-  //       return allBoard;
-  //     });
-  //   }
-  // };
+      return CopyBoard;
+    });
+
+    setValue("toDo", "");
+  };
+
+  const boardChange = ({ boardChange }: IForm) => {
+    if (boardDelete) {
+      setTodos((allBoard) => {
+        const CopyBoard: IToDoState[] = deepCopy(allBoard);
+        delete CopyBoard[boardIndex];
+        return CopyBoard;
+      });
+    } else {
+      setTodos((allBoard) => {
+        const CopyBoard: IToDoState[] = deepCopy(allBoard);
+        if (
+          boardChange.trim() !== "" &&
+          CopyBoard.some((i) => Object.keys(i) + "" === boardChange) === false
+        ) {
+          CopyBoard[boardIndex][boardChange] = CopyBoard[boardIndex][boardId];
+          delete CopyBoard[boardIndex][boardId];
+        }
+
+        return CopyBoard;
+      });
+    }
+  };
 
   return (
     <>
       <Wrapper>
-        {/* <Heder>
+        <Heder onMouseDown={selectBoard}>
           <Form onSubmit={handleSubmit(boardChange)}>
             {boardRename ? (
               <input
@@ -90,8 +103,8 @@ const Board = ({ toDos, boardId }: IBoardPops) => {
             type="text"
             placeholder={`Add task on ${boardId}`}
           />
-        </Form> */}
-        {/* <Droppable droppableId={boardId} type="card">
+        </Form>
+        <Droppable droppableId={boardId} type="card">
           {(magic, info) => (
             <Area
               isDraggingOver={info.isDraggingOver}
@@ -99,26 +112,26 @@ const Board = ({ toDos, boardId }: IBoardPops) => {
               ref={magic.innerRef}
               {...magic.droppableProps}
             >
-              {toDos.map((toDo, index) => (
+              {toDos[boardId].map((toDo, index) => (
                 <DraggableCard
                   key={toDo.id}
                   toDoID={toDo.id}
                   index={index}
                   toDoText={toDo.text}
+                  boardIndex={boardIndex}
                   boardId={boardId}
                 />
               ))}
               {magic.placeholder}
             </Area>
           )}
-        </Droppable> */}
+        </Droppable>
       </Wrapper>
     </>
   );
 };
 
-export default Board;
-
+export default React.memo(Board);
 const Wrapper = styled.div`
   margin-top: 2em;
   width: 100%;
@@ -128,9 +141,11 @@ const Wrapper = styled.div`
   min-height: 300px;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 `;
 
 const Heder = styled.div``;
+//드래깅 영역 설정
 
 const Title = styled.span`
   text-align: center;
@@ -143,9 +158,9 @@ const Title = styled.span`
 const Area = styled.div<IAreaProps>`
   background-color: ${(props) =>
     props.isDraggingOver
-      ? "#f5f6fa"
+      ? "#f5f6fa" // 도착지점 이펙트
       : props.draggingFromThisWith
-      ? "#f1f2f6"
+      ? "#f1f2f6" //벗어난뒤 droppable 영역 색
       : props.theme.boardColor};
   transition: background-color 0.3s ease-in-out;
   flex-grow: 1;

@@ -1,76 +1,94 @@
 import { DropResult } from "react-beautiful-dnd";
 import { SetterOrUpdater } from "recoil";
-import { IToDoState } from "../atoms";
+import { BoardKey, BoardType, IToDoState } from "../atoms";
 
-// export const onDragEnd = (
-//   info: DropResult,
-//   setToDos: SetterOrUpdater<IToDoState>
-// ) => {
-//   const { destination, source, draggableId } = info;
-//   console.table(info);
+export const deepCopy = (obj: any) => {
+  if (typeof obj !== "object" || obj === null) {
+    return obj;
+  }
 
-//   if (!destination) return;
+  const copy: any = Array.isArray(obj) ? [] : {};
+  for (const key in obj) {
+    const value = obj[key];
+    copy[key] = deepCopy(value);
+  }
 
-//   if (destination.droppableId === "board") {
-//     setToDos((allBoard) => {
-//       const boardMap = new Map(Object.entries(allBoard));
-//       console.log(boardMap);
-//       const taskObj = Array.from(boardMap.keys())[source.index];
-//       const taskObjValue = boardMap.get(taskObj);
-//       console.log(taskObj);
+  return copy;
+};
+export const onDragEnd = (
+  info: DropResult,
+  setToDos: SetterOrUpdater<IToDoState[]>
+) => {
+  const { destination, source, type } = info;
 
-//       boardMap.delete(taskObj);
-//       const keysArray = Array.from(boardMap.keys());
-//       keysArray.splice(destination.index, 0, taskObj);
-//       console.log(keysArray);
-//       const newBoardMap = new Map();
-//       keysArray.forEach((key) => {
-//         if (key === taskObj) {
-//           newBoardMap.set(key, taskObjValue);
-//         } else {
-//           newBoardMap.set(key, boardMap.get(key));
-//         }
-//       });
+  if (!destination) return;
+  //   console.table(info);
 
-//       const newBoard = Object.fromEntries(newBoardMap.entries());
-//       console.log(newBoard);
-//       return newBoard;
-//     });
-//     console.log(destination); // 종료
-//     console.log(source); // 시작
-//   } else if (destination.droppableId === "Delete") {
-//     setToDos((allBoard) => {
-//       const boardCopy = [...allBoard[source.droppableId]];
-//       boardCopy.splice(source.index, 1);
-//       return {
-//         ...allBoard,
-//         [source.droppableId]: boardCopy,
-//       };
-//     });
-//   } else if (destination?.droppableId === source.droppableId) {
-//     setToDos((allBoard) => {
-//       const boardCopy = [...allBoard[source.droppableId]];
-//       const taskObj = boardCopy[source.index];
-//       console.table(taskObj);
-//       boardCopy.splice(source.index, 1);
-//       boardCopy.splice(destination?.index, 0, taskObj);
-//       return {
-//         ...allBoard,
-//         [source.droppableId]: boardCopy,
-//       };
-//     });
-//   } else if (destination.droppableId !== source.droppableId) {
-//     setToDos((allBoard) => {
-//       const sourceBoard = [...allBoard[source.droppableId]];
-//       const taskObj = sourceBoard[source.index];
-//       const targetBoard = [...allBoard[destination.droppableId]];
-//       sourceBoard.splice(source.index, 1);
-//       targetBoard.splice(destination?.index, 0, taskObj);
-//       return {
-//         ...allBoard,
-//         [source.droppableId]: sourceBoard,
-//         [destination.droppableId]: targetBoard,
-//       };
-//     });
-//   }
-// };
+  if (type === "board") {
+    if (destination.droppableId === "board") {
+      setToDos((allBoard) => {
+        const CopyBoard: IToDoState[] = deepCopy(allBoard);
+        const TargetBoard = CopyBoard[source.index];
+        CopyBoard.splice(source.index, 1);
+        CopyBoard.splice(destination.index, 0, TargetBoard);
+        return CopyBoard;
+      });
+    } else if (destination.droppableId === "Delete") {
+      setToDos((allBoard) => {
+        const CopyBoard = deepCopy(allBoard);
+        CopyBoard.splice(source.index, 1);
+        return CopyBoard;
+      });
+    }
+  }
+
+  if (type === "card") {
+    if (destination.droppableId === "Delete") {
+      setToDos((allBoard) => {
+        const CopyBoard: IToDoState[] = deepCopy(allBoard);
+        const BoardIndex = CopyBoard.findIndex(
+          (i) => Object.keys(i) + "" === source.droppableId
+        );
+        const board = CopyBoard[BoardIndex];
+        board[source.droppableId].splice(source.index, 1);
+
+        return CopyBoard;
+      });
+    } else if (destination?.droppableId === source.droppableId) {
+      setToDos((allBoard) => {
+        const CopyBoard: IToDoState[] = deepCopy(allBoard);
+        const BoardIndex = CopyBoard.findIndex(
+          (i) => Object.keys(i) + "" === source.droppableId
+        );
+        const sourceCard =
+          CopyBoard[BoardIndex][source.droppableId][source.index];
+        CopyBoard[BoardIndex][source.droppableId].splice(source.index, 1);
+        CopyBoard[BoardIndex][source.droppableId].splice(
+          destination.index,
+          0,
+          sourceCard
+        );
+        return CopyBoard;
+      });
+    } else if (destination.droppableId !== source.droppableId) {
+      setToDos((allBoard) => {
+        const CopyBoard: IToDoState[] = deepCopy(allBoard);
+        const sourceIndex = CopyBoard.findIndex(
+          (i) => Object.keys(i) + "" === source.droppableId
+        );
+        const destinationIndex = CopyBoard.findIndex(
+          (i) => Object.keys(i) + "" === destination.droppableId
+        );
+
+        const sourceBoard = CopyBoard[sourceIndex][source.droppableId];
+        const toDo = { ...sourceBoard[source.index] };
+        const destinationBoard =
+          CopyBoard[destinationIndex][destination.droppableId];
+        sourceBoard.splice(source.index, 1);
+        destinationBoard.splice(destination.index, 0, toDo);
+
+        return CopyBoard;
+      });
+    }
+  }
+};

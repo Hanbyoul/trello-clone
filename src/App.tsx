@@ -2,54 +2,40 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-// import { onDragEnd } from "./\butils";
-import { toDoState } from "./atoms";
+import { IToDoState, toDoState } from "./atoms";
 import Board, { IForm } from "./components/Board";
 import DeleteCard from "./components/DeleteCard";
+import { deepCopy, onDragEnd } from "./\butils";
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const { register, handleSubmit, setValue } = useForm<IForm>();
-
   const onValid = ({ toDo }: IForm) => {
     if (toDos.length >= 5) {
       alert("최대 5개의 Board만 생성 가능합니다.");
       setValue("toDo", "");
       return;
     }
-    // setToDos((allBoard) => {
-    //   if (
-    //   allBoard.some((item) => item === toDo) !== true &&
-    //     toDo.trim() !== ""
-    //   ) {
-    //     return { ...allBoard, [toDo]: [] };
-    //   }
-    //   return allBoard;
-    // });
-    setToDos((allBoard) => {
-      if (
-        allBoard.some(
-          (board) =>
-            (Object.keys(board)[0] === toDo) !== true && toDo.trim() !== ""
-        )
-      ) {
-        const newBoard = [...allBoard];
-        newBoard.push({ [toDo]: [] });
 
-        return newBoard;
+    setToDos((allBoard) => {
+      const CopyBoard: IToDoState[] = deepCopy(allBoard);
+      if (
+        CopyBoard.some((i) => Object.keys(i) + "" === toDo) === false &&
+        toDo.trim() !== ""
+      ) {
+        CopyBoard.push({ [toDo]: [] });
+
+        return CopyBoard;
       }
 
-      return allBoard;
+      return CopyBoard;
     });
 
     setValue("toDo", "");
   };
-  console.log(toDos[1]);
-  console.log(toDos.map((board, index) => Object.keys(board)[index]));
-  const onDragEnd = () => {};
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={(info) => onDragEnd(info, setToDos)}>
       <Heder>
         <Form onSubmit={handleSubmit(onValid)}>
           <input
@@ -64,11 +50,11 @@ function App() {
         {(magic) => (
           <Wrapper ref={magic.innerRef} {...magic.droppableProps}>
             <BoardList>
-              {toDos.map((board, index) => (
+              {toDos.map((board, boardIndex) => (
                 <Draggable
-                  draggableId={Object.keys(board)[index]}
-                  key={Object.keys(board)[index]}
-                  index={index}
+                  draggableId={Object.keys(board) + ""}
+                  key={Object.keys(board) + ""}
+                  index={boardIndex}
                 >
                   {(magic) => (
                     <div
@@ -77,14 +63,16 @@ function App() {
                       {...magic.draggableProps}
                     >
                       <Board
-                        key={Object.keys(board)[index]}
-                        toDos={board[index]}
-                        boardId={Object.keys(board)[index]}
+                        key={Object.keys(board) + ""}
+                        toDos={board}
+                        boardId={Object.keys(board) + ""}
+                        boardIndex={boardIndex}
                       />
                     </div>
                   )}
                 </Draggable>
               ))}
+              {magic.placeholder}
             </BoardList>
           </Wrapper>
         )}
@@ -109,6 +97,8 @@ const Heder = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 1.5em;
+  margin-left: 10em;
+  padding-bottom: 100px;
 `;
 const BoardList = styled.div`
   display: grid;
