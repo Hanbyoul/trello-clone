@@ -52,7 +52,7 @@ const Board = ({ toDos, boardId, boardIndex }: IBoardPops) => {
     if (boardDelete) {
       setTodos((allBoard) => {
         const CopyBoard: IToDoState[] = deepCopy(allBoard);
-        delete CopyBoard[boardIndex];
+        CopyBoard.splice(boardIndex, 1);
         return CopyBoard;
       });
     } else {
@@ -62,10 +62,9 @@ const Board = ({ toDos, boardId, boardIndex }: IBoardPops) => {
           boardChange.trim() !== "" &&
           CopyBoard.some((i) => Object.keys(i) + "" === boardChange) === false
         ) {
-          CopyBoard[boardIndex][boardChange] = CopyBoard[boardIndex][boardId];
-          delete CopyBoard[boardIndex][boardId];
+          const newBoard = { [boardChange]: CopyBoard[boardIndex][boardId] };
+          CopyBoard.splice(boardIndex, 1, newBoard);
         }
-
         return CopyBoard;
       });
     }

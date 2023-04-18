@@ -129,8 +129,7 @@ const Form = styled.form`
 `;
 
 const DragArea = styled.div`
-  /* background-color: red; */
-  width: 80%;
+  width: 65%;
   height: 50px;
   position: relative;
   bottom: -50px;

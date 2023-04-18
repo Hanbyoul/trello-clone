@@ -25,7 +25,6 @@ const DraggableCard = ({
   boardIndex,
   boardId,
 }: IDraggableCardProps) => {
-  console.log(`${toDoText} render`);
   const setTodo = useSetRecoilState(toDoState);
   const setBoardType = useSetRecoilState<BoardKey>(BoardType);
   const { register, handleSubmit } = useForm<IForm>();
