@@ -25,6 +25,7 @@ const DraggableCard = ({
   boardIndex,
   boardId,
 }: IDraggableCardProps) => {
+  console.log(`${toDoText} render`);
   const setTodo = useSetRecoilState(toDoState);
   const setBoardType = useSetRecoilState<BoardKey>(BoardType);
   const { register, handleSubmit } = useForm<IForm>();
@@ -33,7 +34,6 @@ const DraggableCard = ({
 
   const selectCard = () => {
     setBoardType((prev) => (prev = "card"));
-    console.log("카드클릭");
   };
   const Valid = ({ toDo }: IForm) => {
     if (deleted) {

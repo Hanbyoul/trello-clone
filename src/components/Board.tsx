@@ -3,7 +3,7 @@ import { Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { BoardKey, BoardType, IToDo, IToDoState, toDoState } from "../atoms";
+import { IToDo, IToDoState, toDoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
 import { deepCopy } from "../\butils";
 
@@ -27,14 +27,10 @@ export interface IForm {
 
 const Board = ({ toDos, boardId, boardIndex }: IBoardPops) => {
   const setTodos = useSetRecoilState(toDoState);
-  const setBoardType = useSetRecoilState<BoardKey>(BoardType);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const [boardDelete, setBoardDelete] = useState(false);
   const [boardRename, setBoardRename] = useState(false);
 
-  const selectBoard = () => {
-    setBoardType((prev) => (prev = "board"));
-  };
   const onValid = ({ toDo }: IForm) => {
     const newToDo = {
       id: Date.now(),
@@ -78,7 +74,7 @@ const Board = ({ toDos, boardId, boardIndex }: IBoardPops) => {
   return (
     <>
       <Wrapper>
-        <Heder onMouseDown={selectBoard}>
+        <Heder>
           <Form onSubmit={handleSubmit(boardChange)}>
             {boardRename ? (
               <input
@@ -101,6 +97,7 @@ const Board = ({ toDos, boardId, boardIndex }: IBoardPops) => {
           <input
             {...register("toDo")}
             type="text"
+            autoComplete="false"
             placeholder={`Add task on ${boardId}`}
           />
         </Form>
@@ -191,6 +188,7 @@ const ItemBtn = styled.div`
 `;
 const ExitBtn = styled.button`
   all: unset;
+  cursor: pointer;
   border-radius: 20px;
   font-weight: 400;
   font-size: 14px;
@@ -211,6 +209,7 @@ const ExitBtn = styled.button`
 
 const EditBtn = styled.button`
   all: unset;
+  cursor: pointer;
   border-radius: 20px;
   font-weight: 400;
   font-size: 15px;

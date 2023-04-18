@@ -1,15 +1,21 @@
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { IToDoState, toDoState } from "./atoms";
+import { BoardKey, BoardType, IToDoState, toDoState } from "./atoms";
 import Board, { IForm } from "./components/Board";
 import DeleteCard from "./components/DeleteCard";
 import { deepCopy, onDragEnd } from "./\butils";
+import React from "react";
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const { register, handleSubmit, setValue } = useForm<IForm>();
+  const setBoardType = useSetRecoilState<BoardKey>(BoardType);
+
+  const selectBoard = () => {
+    setBoardType((prev) => (prev = "board"));
+  };
   const onValid = ({ toDo }: IForm) => {
     if (toDos.length >= 5) {
       alert("최대 5개의 Board만 생성 가능합니다.");
@@ -42,6 +48,7 @@ function App() {
             {...register("toDo", { required: true })}
             type="text"
             placeholder="Add new Board"
+            autoComplete="false"
           />
         </Form>
         <DeleteCard />
@@ -57,11 +64,11 @@ function App() {
                   index={boardIndex}
                 >
                   {(magic) => (
-                    <div
-                      ref={magic.innerRef}
-                      {...magic.dragHandleProps}
-                      {...magic.draggableProps}
-                    >
+                    <div ref={magic.innerRef} {...magic.draggableProps}>
+                      <DragArea
+                        {...magic.dragHandleProps}
+                        onMouseDown={selectBoard}
+                      ></DragArea>
                       <Board
                         key={Object.keys(board) + ""}
                         toDos={board}
@@ -119,4 +126,13 @@ const Form = styled.form`
     padding: 0px 40px;
     font-size: 1.5em;
   }
+`;
+
+const DragArea = styled.div`
+  /* background-color: red; */
+  width: 80%;
+  height: 50px;
+  position: relative;
+  bottom: -50px;
+  z-index: 2;
 `;
